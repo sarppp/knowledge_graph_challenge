@@ -9,6 +9,13 @@ Namely;
 - "Which companies have similar technology stacks to [specific company]?"
 """
 
+import sys
+import os
+
+# Add parent directory to path so we can import modules
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+
 from similarity_analysis import StartupSimilarityAnalyzer
 
 def test_specific_queries():
@@ -17,8 +24,9 @@ def test_specific_queries():
     print("🚀 TESTING SPECIFIC SIMILARITY QUERIES")
     print("=" * 60)
     
-    # Initialize analyzer
-    analyzer = StartupSimilarityAnalyzer('startup_knowledge_graph.json')
+    # Initialize analyzer (JSON file is in parent directory)
+    json_path = os.path.join(parent_dir, 'startup_knowledge_graph.json')
+    analyzer = StartupSimilarityAnalyzer(json_path)
     
     # Test 1: Find startups similar to a specific company
     print("\n1️⃣ Find 5 startups most similar to 'Robinson':")
