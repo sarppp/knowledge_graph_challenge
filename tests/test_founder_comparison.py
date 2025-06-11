@@ -10,7 +10,11 @@ import os
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 
-from enhanced_founder_search import EnhancedFounderSearch
+# Add utils directory to path
+utils_dir = os.path.join(parent_dir, 'utils')
+sys.path.append(utils_dir)
+
+from utils.enhanced_founder_search import EnhancedFounderSearch
 
 def quick_test():
     """Quick test with a few founders"""
