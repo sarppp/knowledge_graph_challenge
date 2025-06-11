@@ -9,6 +9,7 @@ import os
 from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import logging
+import math
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -26,9 +27,43 @@ class SimpleNeo4jImporter:
         if not self.uri or not self.password:
             raise ValueError("Please set NEO4J_URI and NEO4J_PASSWORD in your .env file")
         
-        # Connect to Neo4j
-        self.driver = GraphDatabase.driver(self.uri, auth=(self.username, self.password))
+        # Connect to Neo4j with notification filtering
+        self.driver = GraphDatabase.driver(
+            self.uri, 
+            auth=(self.username, self.password),
+            notifications_min_severity='WARNING'  # Suppress INFO notifications
+        )
         logger.info("🔌 Connected to Neo4j")
+    
+    def clean_property_value(self, value):
+        """Clean property values for Neo4j compatibility"""
+        # Handle NaN values
+        if isinstance(value, float) and math.isnan(value):
+            return None
+        
+        # Handle string representations of arrays
+        if isinstance(value, str):
+            if value.startswith('[') and value.endswith(']'):
+                try:
+                    # Try to parse as JSON array
+                    import ast
+                    return ast.literal_eval(value)
+                except:
+                    # If parsing fails, return as string
+                    return value
+        
+        # Handle None values represented as strings
+        if value == 'NaN' or value == 'None' or value == 'null':
+            return None
+            
+        return value
+    
+    def clean_properties(self, properties):
+        """Clean all properties in a dictionary"""
+        cleaned = {}
+        for key, value in properties.items():
+            cleaned[key] = self.clean_property_value(value)
+        return cleaned
     
     def test_connection(self):
         """Test the Neo4j connection"""
@@ -86,10 +121,14 @@ class SimpleNeo4jImporter:
         with self.driver.session() as session:
             for constraint in constraints:
                 try:
-                    session.run(constraint)
-                    logger.info(f"✅ Created constraint: {constraint.split()[2]}")
+                    # Suppress notifications for constraint creation
+                    session.run(constraint, notifications_min_severity='WARNING')
+                    constraint_name = constraint.split()[2]
+                    logger.info(f"✅ Constraint ensured: {constraint_name}")
                 except Exception as e:
-                    logger.warning(f"Constraint already exists or failed: {e}")
+                    # Only log actual errors, not "already exists" notifications
+                    if "already exists" not in str(e).lower():
+                        logger.warning(f"Constraint creation failed: {e}")
     
     def import_entities(self, entities):
         """Import all entities to Neo4j"""
@@ -102,8 +141,8 @@ class SimpleNeo4jImporter:
             if entity_type not in entity_groups:
                 entity_groups[entity_type] = []
             
-            # Add the entity with its ID
-            entity_with_id = entity_data['properties'].copy()
+            # Add the entity with its ID and clean properties
+            entity_with_id = self.clean_properties(entity_data['properties'].copy())
             entity_with_id['id'] = entity_id
             entity_groups[entity_type].append(entity_with_id)
         
@@ -139,13 +178,17 @@ class SimpleNeo4jImporter:
         """Import all relationships to Neo4j"""
         logger.info(f"🔗 Importing {len(relationships)} relationships...")
         
-        # Group relationships by type
+        # Group relationships by type and clean properties
         rel_groups = {}
         for rel in relationships:
             rel_type = rel['type']
             if rel_type not in rel_groups:
                 rel_groups[rel_type] = []
-            rel_groups[rel_type].append(rel)
+            
+            # Clean relationship properties
+            cleaned_rel = rel.copy()
+            cleaned_rel['properties'] = self.clean_properties(rel.get('properties', {}))
+            rel_groups[rel_type].append(cleaned_rel)
         
         # Import each relationship type
         for rel_type, rel_list in rel_groups.items():
@@ -219,13 +262,13 @@ def main():
         
         # Test connection
         if not importer.test_connection():
-            print("❌ Failed to connect to Neo4j. Check your .env file.")
+            print(" Failed to connect to Neo4j. Check your .env file.")
             return
         
         # Check if data already exists
         stats = importer.get_node_counts()
         if stats['total_nodes'] > 0:
-            print(f"⚠️  Database already contains {stats['total_nodes']} nodes")
+            print(f"  Database already contains {stats['total_nodes']} nodes")
             response = input("Clear database and reimport? (y/N): ")
             if response.lower() == 'y':
                 importer.clear_database()
@@ -237,7 +280,7 @@ def main():
         importer.import_knowledge_graph('startup_knowledge_graph.json')
         
     except Exception as e:
-        logger.error(f"❌ Import failed: {e}")
+        logger.error(f" Import failed: {e}")
     finally:
         if 'importer' in locals():
             importer.close()
