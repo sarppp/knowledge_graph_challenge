@@ -1,0 +1,127 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 700px;
+                 background-color: #1a1a1a;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#45B7D1", "font": {"color": "white"}, "id": "vc_129", "label": "Vargas Equity", "shape": "square", "size": 48, "title": "\u003cb\u003eVC\u003c/b\u003e\u003cbr\u003eConnections: 24\u003cbr\u003eName: Vargas Equity\u003cbr\u003e"}, {"color": "#96CEB4", "font": {"color": "white"}, "id": "tech_55", "label": "UltraLink", "shape": "diamond", "size": 50, "title": "\u003cb\u003eTECHNOLOGY\u003c/b\u003e\u003cbr\u003eConnections: 65\u003cbr\u003eName: UltraLink\u003cbr\u003e"}, {"color": "#4ECDC4", "font": {"color": "white"}, "id": "founder_487", "label": "Bobby Becker", "shape": "triangle", "size": 15, "title": "\u003cb\u003eFOUNDER\u003c/b\u003e\u003cbr\u003eConnections: 1\u003cbr\u003eName: Bobby Becker\u003cbr\u003e"}, {"color": "#96CEB4", "font": {"color": "white"}, "id": "tech_26", "label": "React Native", "shape": "diamond", "size": 50, "title": "\u003cb\u003eTECHNOLOGY\u003c/b\u003e\u003cbr\u003eConnections: 66\u003cbr\u003eName: React Native\u003cbr\u003e"}, {"color": "#45B7D1", "font": {"color": "white"}, "id": "vc_61", "label": "Founders Day", "shape": "square", "size": 44, "title": "\u003cb\u003eVC\u003c/b\u003e\u003cbr\u003eConnections: 22\u003cbr\u003eName: Founders Day\u003cbr\u003e"}, {"color": "#FF6B6B", "font": {"color": "white"}, "id": "startup_538", "label": "Sherman-Eaton", "shape": "dot", "size": 38, "title": "\u003cb\u003eSTARTUP\u003c/b\u003e\u003cbr\u003eConnections: 19\u003cbr\u003eName: Sherman-Eaton\u003cbr\u003e"}, {"color": "#FF6B6B", "font": {"color": "white"}, "id": "startup_650", "label": "Sanders", "shape": "dot", "size": 38, "title": "\u003cb\u003eSTARTUP\u003c/b\u003e\u003cbr\u003eConnections: 19\u003cbr\u003eName: Sanders\u003cbr\u003e"}, {"color": "#45B7D1", "font": {"color": "white"}, "id": "vc_16", "label": "Rapid Capital", "shape": "square", "size": 50, "title": "\u003cb\u003eVC\u003c/b\u003e\u003cbr\u003eConnections: 26\u003cbr\u003eName: Rapid Capital\u003cbr\u003e"}, {"color": "#4ECDC4", "font": {"color": "white"}, "id": "founder_736", "label": "Stephanie Mckin", "shape": "triangle", "size": 15, "title": "\u003cb\u003eFOUNDER\u003c/b\u003e\u003cbr\u003eConnections: 1\u003cbr\u003eName: Stephanie Mckinney\u003cbr\u003e"}, {"color": "#45B7D1", "font": {"color": "white"}, "id": "vc_83", "label": "Quantum Venture", "shape": "square", "size": 42, "title": "\u003cb\u003eVC\u003c/b\u003e\u003cbr\u003eConnections: 21\u003cbr\u003eName: Quantum Ventures\u003cbr\u003e"}, {"color": "#96CEB4", "font": {"color": "white"}, "id": "tech_61", "label": "MaxSync", "shape": "diamond", "size": 50, "title": "\u003cb\u003eTECHNOLOGY\u003c/b\u003e\u003cbr\u003eConnections: 65\u003cbr\u003eName: MaxSync\u003cbr\u003e"}, {"color": "#FF6B6B", "font": {"color": "white"}, "id": "startup_160", "label": "InfiniteSolutio", "shape": "dot", "size": 38, "title": "\u003cb\u003eSTARTUP\u003c/b\u003e\u003cbr\u003eConnections: 19\u003cbr\u003eName: InfiniteSolutions\u003cbr\u003e"}, {"color": "#FF6B6B", "font": {"color": "white"}, "id": "startup_571", "label": "Erickson, Mille", "shape": "dot", "size": 42, "title": "\u003cb\u003eSTARTUP\u003c/b\u003e\u003cbr\u003eConnections: 21\u003cbr\u003eName: Erickson, Miller and Jones\u003cbr\u003e"}, {"color": "#4ECDC4", "font": {"color": "white"}, "id": "founder_1529", "label": "Nancy Carpenter", "shape": "triangle", "size": 15, "title": "\u003cb\u003eFOUNDER\u003c/b\u003e\u003cbr\u003eConnections: 1\u003cbr\u003eName: Nancy Carpenter\u003cbr\u003e"}, {"color": "#FF6B6B", "font": {"color": "white"}, "id": "startup_213", "label": "InfiniteTechnol", "shape": "dot", "size": 36, "title": "\u003cb\u003eSTARTUP\u003c/b\u003e\u003cbr\u003eConnections: 18\u003cbr\u003eName: InfiniteTechnologies\u003cbr\u003e"}, {"color": "#4ECDC4", "font": {"color": "white"}, "id": "founder_701", "label": "David Martinez", "shape": "triangle", "size": 15, "title": "\u003cb\u003eFOUNDER\u003c/b\u003e\u003cbr\u003eConnections: 1\u003cbr\u003eName: David Martinez\u003cbr\u003e"}, {"color": "#4ECDC4", "font": {"color": "white"}, "id": "founder_1758", "label": "Brian Riddle", "shape": "triangle", "size": 15, "title": "\u003cb\u003eFOUNDER\u003c/b\u003e\u003cbr\u003eConnections: 1\u003cbr\u003eName: Brian Riddle\u003cbr\u003e"}, {"color": "#96CEB4", "font": {"color": "white"}, "id": "tech_29", "label": "Kotlin", "shape": "diamond", "size": 50, "title": "\u003cb\u003eTECHNOLOGY\u003c/b\u003e\u003cbr\u003eConnections: 66\u003cbr\u003eName: Kotlin\u003cbr\u003e"}, {"color": "#45B7D1", "font": {"color": "white"}, "id": "vc_30", "label": "Neural Partners", "shape": "square", "size": 44, "title": "\u003cb\u003eVC\u003c/b\u003e\u003cbr\u003eConnections: 22\u003cbr\u003eName: Neural Partners\u003cbr\u003e"}, {"color": "#45B7D1", "font": {"color": "white"}, "id": "vc_42", "label": "Reyes Equity", "shape": "square", "size": 44, "title": "\u003cb\u003eVC\u003c/b\u003e\u003cbr\u003eConnections: 22\u003cbr\u003eName: Reyes Equity\u003cbr\u003e"}, {"color": "#FF6B6B", "font": {"color": "white"}, "id": "startup_699", "label": "PrimeLogic", "shape": "dot", "size": 44, "title": "\u003cb\u003eSTARTUP\u003c/b\u003e\u003cbr\u003eConnections: 22\u003cbr\u003eName: PrimeLogic\u003cbr\u003e"}, {"color": "#4ECDC4", "font": {"color": "white"}, "id": "founder_568", "label": "Lauren Torres", "shape": "triangle", "size": 15, "title": "\u003cb\u003eFOUNDER\u003c/b\u003e\u003cbr\u003eConnections: 1\u003cbr\u003eName: Lauren Torres\u003cbr\u003e"}, {"color": "#45B7D1", "font": {"color": "white"}, "id": "vc_66", "label": "Founders Taylor", "shape": "square", "size": 44, "title": "\u003cb\u003eVC\u003c/b\u003e\u003cbr\u003eConnections: 22\u003cbr\u003eName: Founders Taylor\u003cbr\u003e"}, {"color": "#4ECDC4", "font": {"color": "white"}, "id": "founder_75", "label": "Eric Nicholson", "shape": "triangle", "size": 15, "title": "\u003cb\u003eFOUNDER\u003c/b\u003e\u003cbr\u003eConnections: 1\u003cbr\u003eName: Eric Nicholson\u003cbr\u003e"}, {"color": "#FF6B6B", "font": {"color": "white"}, "id": "startup_118", "label": "Williams-Townse", "shape": "dot", "size": 40, "title": "\u003cb\u003eSTARTUP\u003c/b\u003e\u003cbr\u003eConnections: 20\u003cbr\u003eName: Williams-Townsend\u003cbr\u003e"}, {"color": "#FF6B6B", "font": {"color": "white"}, "id": "startup_430", "label": "InfiniteSolutio", "shape": "dot", "size": 38, "title": "\u003cb\u003eSTARTUP\u003c/b\u003e\u003cbr\u003eConnections: 19\u003cbr\u003eName: InfiniteSolutions\u003cbr\u003e"}, {"color": "#96CEB4", "font": {"color": "white"}, "id": "tech_0", "label": "React", "shape": "diamond", "size": 50, "title": "\u003cb\u003eTECHNOLOGY\u003c/b\u003e\u003cbr\u003eConnections: 67\u003cbr\u003eName: React\u003cbr\u003e"}, {"color": "#96CEB4", "font": {"color": "white"}, "id": "tech_16", "label": "AWS", "shape": "diamond", "size": 50, "title": "\u003cb\u003eTECHNOLOGY\u003c/b\u003e\u003cbr\u003eConnections: 65\u003cbr\u003eName: AWS\u003cbr\u003e"}, {"color": "#96CEB4", "font": {"color": "white"}, "id": "tech_70", "label": "MaxFlow", "shape": "diamond", "size": 50, "title": "\u003cb\u003eTECHNOLOGY\u003c/b\u003e\u003cbr\u003eConnections: 65\u003cbr\u003eName: MaxFlow\u003cbr\u003e"}, {"color": "#96CEB4", "font": {"color": "white"}, "id": "tech_67", "label": "NeoAPI", "shape": "diamond", "size": 50, "title": "\u003cb\u003eTECHNOLOGY\u003c/b\u003e\u003cbr\u003eConnections: 67\u003cbr\u003eName: NeoAPI\u003cbr\u003e"}, {"color": "#45B7D1", "font": {"color": "white"}, "id": "vc_89", "label": "Founders Mitche", "shape": "square", "size": 42, "title": "\u003cb\u003eVC\u003c/b\u003e\u003cbr\u003eConnections: 21\u003cbr\u003eName: Founders Mitchell\u003cbr\u003e"}, {"color": "#4ECDC4", "font": {"color": "white"}, "id": "founder_1650", "label": "Jonathan Willia", "shape": "triangle", "size": 15, "title": "\u003cb\u003eFOUNDER\u003c/b\u003e\u003cbr\u003eConnections: 1\u003cbr\u003eName: Jonathan Williams\u003cbr\u003e"}]);
+                  edges = new vis.DataSet([{"color": "#95A5A6", "from": "vc_129", "title": "Relationship: INVESTS_IN", "to": "startup_118", "width": 2}, {"color": "#95A5A6", "from": "vc_30", "title": "Relationship: INVESTS_IN", "to": "startup_160", "width": 2}, {"color": "#95A5A6", "from": "vc_83", "title": "Relationship: INVESTS_IN", "to": "startup_213", "width": 2}, {"color": "#95A5A6", "from": "vc_129", "title": "Relationship: INVESTS_IN", "to": "startup_430", "width": 2}, {"color": "#95A5A6", "from": "vc_89", "title": "Relationship: INVESTS_IN", "to": "startup_538", "width": 2}, {"color": "#95A5A6", "from": "vc_42", "title": "Relationship: INVESTS_IN", "to": "startup_650", "width": 2}, {"color": "#95A5A6", "from": "vc_61", "title": "Relationship: INVESTS_IN", "to": "startup_650", "width": 2}, {"color": "#95A5A6", "from": "vc_61", "title": "Relationship: INVESTS_IN", "to": "startup_699", "width": 2}, {"color": "#96CEB4", "from": "startup_160", "title": "Relationship: USES_TECHNOLOGY", "to": "tech_55", "width": 2}, {"color": "#96CEB4", "from": "startup_213", "title": "Relationship: USES_TECHNOLOGY", "to": "tech_61", "width": 2}, {"color": "#96CEB4", "from": "startup_213", "title": "Relationship: USES_TECHNOLOGY", "to": "tech_29", "width": 2}, {"color": "#96CEB4", "from": "startup_430", "title": "Relationship: USES_TECHNOLOGY", "to": "tech_55", "width": 2}, {"color": "#96CEB4", "from": "startup_430", "title": "Relationship: USES_TECHNOLOGY", "to": "tech_70", "width": 2}, {"color": "#96CEB4", "from": "startup_538", "title": "Relationship: USES_TECHNOLOGY", "to": "tech_67", "width": 2}, {"color": "#96CEB4", "from": "startup_571", "title": "Relationship: USES_TECHNOLOGY", "to": "tech_55", "width": 2}, {"color": "#96CEB4", "from": "startup_650", "title": "Relationship: USES_TECHNOLOGY", "to": "tech_16", "width": 2}, {"color": "#96CEB4", "from": "startup_699", "title": "Relationship: USES_TECHNOLOGY", "to": "tech_55", "width": 2}, {"color": "#96CEB4", "from": "startup_699", "title": "Relationship: USES_TECHNOLOGY", "to": "tech_0", "width": 2}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"physics": {"enabled": true, "stabilization": {"iterations": 50}, "barnesHut": {"gravitationalConstant": -30000, "springConstant": 0.01, "springLength": 100}}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
