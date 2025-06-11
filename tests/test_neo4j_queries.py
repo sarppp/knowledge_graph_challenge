@@ -87,15 +87,17 @@ class Neo4jGraphTester:
         
         # Sample startups
         startups = self.run_query(
-            "MATCH (s:Startup) RETURN s.id, s.name, s.industry, s.founded_year LIMIT 5",
+            "MATCH (s:Startup) RETURN s.id, s.name, s.industry, s.founded_date, s.stage, s.employee_count LIMIT 5",
             "Sample Startups:"
         )
         for startup in startups:
             name = startup['s.name'] or 'Unknown'
             startup_id = startup['s.id'] or 'Unknown'
             industry = startup['s.industry'] or 'Unknown'
-            founded = startup['s.founded_year'] or 'Unknown'
-            print(f"  • {name} ({startup_id}) - {industry} - Founded: {founded}")
+            founded = startup['s.founded_date'] or 'Unknown'
+            stage = startup['s.stage'] or 'Unknown'
+            employees = startup['s.employee_count'] or 'Unknown'
+            print(f"  • {name} ({startup_id}) - {industry} - Stage: {stage} - Founded: {founded} - Size: {employees}")
         
         # Sample founders - check what properties actually exist
         founders = self.run_query(
@@ -110,28 +112,30 @@ class Neo4jGraphTester:
         
         # Sample VCs
         vcs = self.run_query(
-            "MATCH (v:VC) RETURN v.id, v.name, v.total_assets, v.investment_focus LIMIT 5",
+            "MATCH (v:VC) RETURN v.id, v.name, v.aum, v.focus_industries, v.investment_stage LIMIT 5",
             "Sample VCs:"
         )
         for vc in vcs:
             name = vc['v.name'] or 'Unknown'
             vc_id = vc['v.id'] or 'Unknown'
-            assets = vc['v.total_assets']
-            focus = vc['v.investment_focus'] or 'Unknown'
-            assets_str = f"${assets:,}" if assets is not None else 'Unknown'
-            print(f"  • {name} ({vc_id}) - Assets: {assets_str}, Focus: {focus}")
+            aum = vc['v.aum']
+            focus = vc['v.focus_industries'] or 'Unknown'
+            stage = vc['v.investment_stage'] or 'Unknown'
+            aum_str = f"${aum:,}" if aum is not None else 'Unknown'
+            print(f"  • {name} ({vc_id}) - AUM: {aum_str}, Focus: {focus}, Stage: {stage}")
         
         # Sample technologies
         techs = self.run_query(
-            "MATCH (t:Technology) RETURN t.id, t.name, t.category, t.maturity_level LIMIT 5",
+            "MATCH (t:Technology) RETURN t.id, t.name, t.category, t.maturity, t.popularity_score LIMIT 5",
             "Sample Technologies:"
         )
         for tech in techs:
             name = tech['t.name'] or 'Unknown'
             tech_id = tech['t.id'] or 'Unknown'
             category = tech['t.category'] or 'Unknown'
-            maturity = tech['t.maturity_level'] or 'Unknown'
-            print(f"  • {name} ({tech_id}) - Category: {category}, Maturity: {maturity}")
+            maturity = tech['t.maturity'] or 'Unknown'
+            popularity = tech['t.popularity_score'] if tech['t.popularity_score'] is not None else 'Unknown'
+            print(f"  • {name} ({tech_id}) - Category: {category}, Maturity: {maturity}, Popularity: {popularity}")
     
     def test_relationship_integrity(self):
         """Test relationship integrity and properties"""
