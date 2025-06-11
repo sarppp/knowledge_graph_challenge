@@ -136,6 +136,9 @@ Cypher: MATCH (vc1:VC {{name: 'Williams Ventures'}})-[:INVESTS_IN]->(s:Startup)<
 User: "If I'm starting an EdTech company, which VCs should I target?"
 Cypher: MATCH (vc:VC)-[:INVESTS_IN]->(s:Startup) WHERE s.industry = 'EdTech' RETURN vc.name AS vc_name, count(s) AS edtech_investments ORDER BY edtech_investments DESC LIMIT 10
 
+User: "Find founders with similar backgrounds to David Norman"
+Cypher: MATCH (target:Founder {{name: 'David Norman'}}) MATCH (f:Founder) WHERE f.name <> target.name AND (f.university = target.university OR f.domain_expertise = target.domain_expertise OR f.technical_background = target.technical_background OR f.education_level = target.education_level) RETURN f.name, f.previous_company, f.domain_expertise, f.technical_background, f.education_level, f.university, f.years_experience ORDER BY f.name LIMIT 10
+
 User: "Top 5 industries by startup count?"
 Cypher: MATCH (s:Startup) RETURN s.industry AS industry, count(s) AS startups ORDER BY startups DESC LIMIT 5
 
